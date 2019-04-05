@@ -68,6 +68,11 @@
     color: #757575;
     width: 100%;
 }
+#best-plugin-share-label .notice {
+    color: #900505;
+    display: none;
+    font-size: 13px;
+}
 #best-plugin-share-form input[type="email"] {
     width: 100%;
     padding: 4px 8px;

@@ -1,4 +1,9 @@
 /* admin menu plugin page styles */
+
+.form-table td input {
+    width: 300px;
+}
+
 #best-plugin-ever-menu-logs {
     text-align: center;
     border-collapse: collapse;
@@ -18,4 +23,10 @@
 .pagination-wrap a {
     margin: 0 5px;
     text-decoration: none;
+}
+
+@media (max-width: 430px) {
+    #best-plugin-ever-menu-logs td {
+        padding: 10px 0;
+    }
 }

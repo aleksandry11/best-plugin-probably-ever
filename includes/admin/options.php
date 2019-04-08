@@ -59,7 +59,7 @@ function best_plugin_init() {
     $total = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
 
     //how many items to list per page
-    $limit = 2;
+    $limit = 10;
 
     //how many pages will there be
     $pages = ceil($total/$limit);
@@ -72,8 +72,8 @@ function best_plugin_init() {
         'base' => add_query_arg( 'pagenum', '%#%' ),
         'format' => '',
         'prev_next' => true,
-        'prev_text' => __( '&laquo;', 'text-domain' ),
-        'next_text' => __( '&raquo;', 'text-domain' ),
+        'prev_text' => __( '&laquo;' ),
+        'next_text' => __( '&raquo;' ),
         'total' => $pages,
         'current' => $pagenum
     ) );

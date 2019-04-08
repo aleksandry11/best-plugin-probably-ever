@@ -15,6 +15,8 @@ require dirname(__FILE__) . '/assets/libs/PHPMailer/src/PHPMailer.php';
 require dirname(__FILE__) . '/assets/libs/PHPMailer/src/SMTP.php';
 require dirname(__FILE__) . '/assets/libs/PHPMailer/src/Exception.php';
 
+require dirname(__FILE__) . '/includes/admin/options.php';
+
 /**
  * Add Plugin to wordpress admin menu
  */
@@ -26,51 +28,7 @@ add_action('admin_menu', 'best_plugin_setup_menu');
 /**
  * Admin menu plugin page 
  */
-function best_plugin_init() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'best_plugin_probably_ever';
 
-    echo "<h1>Best Plugin Ever</h1>";
-
-    /**
-     * Sender email auth
-     */
-    ?>
-
-    <form action=""></form>
-
-    <?php
-    /**
-     * sent email logs
-     */
-    $results = $wpdb->get_results("SELECT * FROM $table_name");
-
-    if (!empty($results)) :?>
-        <div class="table-wrapper">
-            <h3>Sent emails log</h3>
-            <table width="100%" id="best-plugin-ever-menu-logs">
-                <tbody>
-                    <tr>
-                        <th>ID</th>
-                        <th>Sent to:</th>
-                        <th>Product's ID:</th>
-                        <th>Time:</th>
-                    </tr>
-                    <?php foreach ($results as $row) : ?>
-                        <tr>
-                            <td><?= $row->id ?></td>
-                            <td><?= $row->email ?></td>
-                            <td><?= $row->product_id ?></td>
-                            <td><?= $row->time ?></td>
-                        </tr>
-                    <?php endforeach;?>
-                </tbody>
-            </table>
-        </div>
-
-    <?php endif;
-
-}
 /**
  * ensure css for plugin's page in admin menu
  */
@@ -145,7 +103,7 @@ HTML;
  */
 function best_plugin_probably_ever_ajax_request() {
     global $wpdb;
-
+    var_dump(get_option('sender_email'));
     $product_id = $_REQUEST['data']['id'];
     $product = wc_get_product($product_id);
     $to = $_REQUEST['data']['email'];
@@ -161,8 +119,8 @@ function best_plugin_probably_ever_ajax_request() {
         $mail->Host = 'smtp.gmail.com';
         $mail->Port = '587';
         $mail->isHTML();
-        $mail->Username = 'charen.test.email@gmail.com';
-        $mail->Password = '4auOT7thgrOb';
+        $mail->Username = get_option('sender_email');
+        $mail->Password = get_option('sender_password');
         $mail->setFrom('no-reply@gmail.com', 'no-reply@charen.com');
         $mail->Subject = 'Hello';
         $mail->Body = <<<HTML

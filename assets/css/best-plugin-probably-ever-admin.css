@@ -3,7 +3,9 @@
 .form-table td input {
     width: 300px;
 }
-
+#passwordToggle {
+    width: unset;
+}
 #best-plugin-ever-menu-logs {
     text-align: center;
     border-collapse: collapse;

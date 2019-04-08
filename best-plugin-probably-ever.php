@@ -35,6 +35,7 @@ add_action('admin_menu', 'best_plugin_setup_menu');
 add_action('admin_head', 'best_plugin_ever_admin_css');
 function best_plugin_ever_admin_css() {
     wp_enqueue_style('best-plugin-probably-ever-admin', plugins_url('assets/css/best-plugin-probably-ever-admin.css', __FILE__), '1.0.0', 'all');
+    wp_enqueue_script('best-plugin-probably-ever-admin-js', plugins_url('assets/js/best-plugin-probably-ever-admin.js', __FILE__), array(), '', true);
 }
 
 

@@ -20,7 +20,6 @@
         }
     }
 
-
     /**
     * Open/close share modal
     */

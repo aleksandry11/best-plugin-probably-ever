@@ -25,7 +25,7 @@ function sender_email_cb() {
 function sender_password_cb() {
     $value = get_option('sender_password');
 
-    echo "<input type='password' name='sender_password' placeholder='Password' value='$value' />";
+    echo "<input type='password' name='sender_password' placeholder='Password' value='$value' /> \n<input id='passwordToggle' type='checkbox'>Show Password";
 }
 
 function best_plugin_init() {

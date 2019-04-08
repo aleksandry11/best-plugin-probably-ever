@@ -1,0 +1,12 @@
+/* admin menu plugin page styles */
+#best-plugin-ever-menu-logs {
+    text-align: center;
+    border-collapse: collapse;
+}
+#best-plugin-ever-menu-logs td {
+    padding: 10px 20px;
+}
+
+#best-plugin-ever-menu-logs tr:nth-child(even) {
+    background-color: #fdfdfd;
+}

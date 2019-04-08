@@ -27,7 +27,56 @@ add_action('admin_menu', 'best_plugin_setup_menu');
  * Admin menu plugin page 
  */
 function best_plugin_init() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'best_plugin_probably_ever';
+
     echo "<h1>Best Plugin Ever</h1>";
+
+    /**
+     * Sender email auth
+     */
+    ?>
+
+    <form action=""></form>
+
+    <?php
+    /**
+     * sent email logs
+     */
+    $results = $wpdb->get_results("SELECT * FROM $table_name");
+
+    if (!empty($results)) :?>
+        <div class="table-wrapper">
+            <h3>Sent emails log</h3>
+            <table width="100%" id="best-plugin-ever-menu-logs">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <th>Sent to:</th>
+                        <th>Product's ID:</th>
+                        <th>Time:</th>
+                    </tr>
+                    <?php foreach ($results as $row) : ?>
+                        <tr>
+                            <td><?= $row->id ?></td>
+                            <td><?= $row->email ?></td>
+                            <td><?= $row->product_id ?></td>
+                            <td><?= $row->time ?></td>
+                        </tr>
+                    <?php endforeach;?>
+                </tbody>
+            </table>
+        </div>
+
+    <?php endif;
+
+}
+/**
+ * ensure css for plugin's page in admin menu
+ */
+add_action('admin_head', 'best_plugin_ever_admin_css');
+function best_plugin_ever_admin_css() {
+    wp_enqueue_style('best-plugin-probably-ever-admin', plugins_url('assets/css/best-plugin-probably-ever-admin.css', __FILE__), '1.0.0', 'all');
 }
 
 
@@ -60,7 +109,7 @@ add_action('init', 'best_plugin_shortcodes_init');
 
 
 /**
- * Email form
+ * Modal Email form
  */
 add_action( 'wp_footer', 'best_plugin_ever_email_form', 15 );
  
@@ -95,7 +144,8 @@ HTML;
  * ajax handler
  */
 function best_plugin_probably_ever_ajax_request() {
-    status_header(500);
+    global $wpdb;
+
     $product_id = $_REQUEST['data']['id'];
     $product = wc_get_product($product_id);
     $to = $_REQUEST['data']['email'];
@@ -107,9 +157,9 @@ function best_plugin_probably_ever_ajax_request() {
         $mail = new PHPMailer(true);
         $mail->isSMTP();
         $mail->SMTPAuth = true;
-        $mail->SMTPSecure = 'ssl';
+        $mail->SMTPSecure = 'tls';
         $mail->Host = 'smtp.gmail.com';
-        $mail->Port = '465';
+        $mail->Port = '587';
         $mail->isHTML();
         $mail->Username = 'charen.test.email@gmail.com';
         $mail->Password = '4auOT7thgrOb';
@@ -124,7 +174,19 @@ function best_plugin_probably_ever_ajax_request() {
 HTML;
         $mail->addAddress($to);
         $mail->send();
-        status_header(200);
+
+        //add data to the db
+        $table_name = $wpdb->prefix . 'best_plugin_probably_ever';
+
+        $wpdb->insert(
+            $table_name,
+            array(
+                'time'          => current_time('mysql'),
+                'email'         => $to,
+                'product_id'    => $product_id
+            )
+        );
+
         echo json_encode(['message' => 'Message sent to ' . $to ]);
     } catch (Exception $e) {
         echo $mail->ErrorInfo;
@@ -134,3 +196,47 @@ HTML;
 }
 add_action('wp_ajax_best_plugin_probably_ever_ajax_request', 'best_plugin_probably_ever_ajax_request');
 add_action('wp_ajax_nopriv_best_plugin_probably_ever_ajax_request', 'best_plugin_probably_ever_ajax_request');
+
+
+
+/**
+ * create plugin's table in database
+ */
+global $best_plugin_ever_db_version;
+$best_plugin_ever_db_version = '1.0';
+
+register_activation_hook( __FILE__, 'best_plugin_ever_table_install' );
+
+function best_plugin_ever_table_install() {
+    global $wpdb, $best_plugin_ever_db_version;
+
+    $installed_version = get_option('best_plugin_ever_db_version');
+
+    if ($installed_version !== $best_plugin_ever_db_version) {
+
+        $table_name = $wpdb->prefix . 'best_plugin_probably_ever';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            email text NOT NULL,
+            product_id mediumint(9) NOT NULL,
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+
+        update_option('best_plugin_ever_db_version', $best_plugin_ever_db_version);
+    }
+}
+
+function best_plugin_ever_db_update_check() {
+    global $best_plugin_ever_db_version;
+    if (get_site_option('best_plugin_ever_db_version') !== $best_plugin_ever_db_version) {
+        best_plugin_ever_table_install();
+    }    
+}
+
+add_action('plugins_loaded', 'best_plugin_ever_db_update_check');

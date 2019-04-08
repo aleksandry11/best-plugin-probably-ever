@@ -39,9 +39,44 @@
         return re.test(String(email).toLowerCase());
     }
 
+    /**
+     * unlock submit button
+     */
     input.onchange = () => {
         submitBtn.disabled = false;
     }
+
+    const xhrHandler = (id, email) => {
+        let xhr = new XMLHttpRequest();
+
+        let data = {
+            action: 'best_plugin_probably_ever_ajax_request',
+            data: {
+                id: id,
+                email: email
+            }
+        };
+        //prevent form from multiple submission
+        submitBtn.setAttribute('disabled', 'disabled');
+
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {  //show message after 'DONE' state
+                if (xhr.status === 200) { //if OK
+                    alert('Message sent to: ' + input.value);
+                    shareBtnHandler();
+                    submitBtn.disabled = false;
+                    input.value = '';
+                } else {
+                    throw new Error(`Something went wrong!\n Server response: ${xhr.responseText}\n Status: ${xhr.status}`);
+                }
+            }
+        }
+        xhr.open('POST', best_plugin_ever_ajax_url.url, true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    
+        xhr.send(JSON_to_URLEncoded(data));
+    }
+
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -51,42 +86,16 @@
             //if validation passed => send request
             input.style.borderColor = '#f1f1f1';
             validationNotice.style.display = 'none';
-            let xhr = new XMLHttpRequest();
-
-            let data = {
-                action: 'best_plugin_probably_ever_ajax_request',
-                data: {
-                    id: id.value,
-                    email: input.value
-                }
-            };
-            //prevent form for multiple submission
-            submitBtn.setAttribute('disabled', 'disabled');
-
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        alert('Message sent to: ' + input.value);
-                        shareBtnHandler();
-                        submitBtn.disabled = false;
-                        input.value = '';
-                        console.log(JSON.parse(xhr.responseText).message, xhr.status);
-                    } else {
-                        // console.log(xhr.responseText, xhr.status);
-                        throw new Error(`Something went wrong!\n Server response: ${xhr.responseText}\n Status: ${xhr.status}`);
-                    }
-                }
-            }
-            xhr.open('POST', best_plugin_ever_ajax_url.url, true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        
-            xhr.send(JSON_to_URLEncoded(data));
+            
+            xhrHandler(id.value, input.value);
         } else {
             input.style.borderColor = '#900505';
             input.value = '';
             validationNotice.style.display = 'inline';
         }
     }
+
+    
 
     function JSON_to_URLEncoded(element,key,list){
         var list = list || [];

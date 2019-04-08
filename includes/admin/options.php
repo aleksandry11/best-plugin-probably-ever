@@ -52,9 +52,43 @@ function best_plugin_init() {
     /**
      * sent email logs
      */
-    $results = $wpdb->get_results("SELECT id, email, product_id, time FROM $table_name");
+    
+    $pagenum = isset($_GET['pagenum']) ? absint($_GET['pagenum']) : 1;
 
+    //How many items are in the table
+    $total = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+
+    //how many items to list per page
+    $limit = 2;
+
+    //how many pages will there be
+    $pages = ceil($total/$limit);
+
+    //Offset for the query
+    $offset = ($pagenum - 1) * $limit;
+
+
+    $page_links = paginate_links( array(
+        'base' => add_query_arg( 'pagenum', '%#%' ),
+        'format' => '',
+        'prev_next' => true,
+        'prev_text' => __( '&laquo;', 'text-domain' ),
+        'next_text' => __( '&raquo;', 'text-domain' ),
+        'total' => $pages,
+        'current' => $pagenum
+    ) );
+
+    echo "<div class='pagination-wrap'><div>$page_links</div></div>";
+
+    //prepate pages query
+    $sql = $wpdb->prepare("SELECT id, email, product_id, time FROM $table_name LIMIT %d OFFSET %d", array($limit, $offset));
+
+    $results = $wpdb->get_results($sql, ARRAY_A);
+    // Do we have any results?
     if (!empty($results)) :?>
+
+        <!-- // Display the results -->
+
         <div class="table-wrapper">
             <h3>Sent emails log</h3>
             <table width="100%" id="best-plugin-ever-menu-logs">
@@ -65,18 +99,24 @@ function best_plugin_init() {
                         <th>Product's ID:</th>
                         <th>Time:</th>
                     </tr>
-                    <?php foreach ($results as $row) : ?>
+
+
+                    <?php foreach ($results as $row) :?>
                         <tr>
-                            <td><?= $row->id ?></td>
-                            <td><?= $row->email ?></td>
-                            <td><?= $row->product_id ?></td>
-                            <td><?= $row->time ?></td>
+                            <td><?= $row['id'] ?></td>
+                            <td><?= $row['email'] ?></td>
+                            <td><?= $row['product_id'] ?></td>
+                            <td><?= $row['time'] ?></td>
                         </tr>
                     <?php endforeach;?>
                 </tbody>
             </table>
         </div>
+    <?php
 
-    <?php endif;
+    else :
+        echo '<p>No results could be displayed.</p>';
+    endif;
+    
     echo '</div>';
 }

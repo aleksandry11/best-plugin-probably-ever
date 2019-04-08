@@ -10,3 +10,12 @@
 #best-plugin-ever-menu-logs tr:nth-child(even) {
     background-color: #fdfdfd;
 }
+
+.pagination-wrap {
+    display: flex;
+    justify-content: center;
+}
+.pagination-wrap a {
+    margin: 0 5px;
+    text-decoration: none;
+}
